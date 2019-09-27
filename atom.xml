@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>hokori</title>
   
-  <subtitle>浥轻尘i</subtitle>
+  <subtitle>hokori</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://hokori.cn/"/>
@@ -10,7 +10,7 @@
   <id>http://hokori.cn/</id>
   
   <author>
-    <name>浥轻尘i</name>
+    <name>hokori</name>
     
   </author>
   
