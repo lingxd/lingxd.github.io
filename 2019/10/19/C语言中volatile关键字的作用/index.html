@@ -155,17 +155,18 @@
 
 
 
-  <meta name="description" content="hentai">
-<meta name="keywords" content="咸鱼">
-<meta property="og:type" content="website">
-<meta property="og:title" content="hokori">
-<meta property="og:url" content="http://hokori.cn/index.html">
+  <meta name="description" content="C语言中volatile关键字的作用注：本文内容来源于冀博)博文，感谢作者的整理。 volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的">
+<meta name="keywords" content="C语言,volatile">
+<meta property="og:type" content="article">
+<meta property="og:title" content="strcpy函数实现">
+<meta property="og:url" content="http://hokori.cn/2019/10/19/C语言中volatile关键字的作用/index.html">
 <meta property="og:site_name" content="hokori">
-<meta property="og:description" content="hentai">
+<meta property="og:description" content="C语言中volatile关键字的作用注：本文内容来源于冀博)博文，感谢作者的整理。 volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-19T02:37:09.855Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="hokori">
-<meta name="twitter:description" content="hentai">
+<meta name="twitter:title" content="strcpy函数实现">
+<meta name="twitter:description" content="C语言中volatile关键字的作用注：本文内容来源于冀博)博文，感谢作者的整理。 volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的">
 
 
 
@@ -174,7 +175,7 @@
 
 
 
-  <link rel="canonical" href="http://hokori.cn/">
+  <link rel="canonical" href="http://hokori.cn/2019/10/19/C语言中volatile关键字的作用/">
 
 
 
@@ -184,7 +185,7 @@
   };
 </script>
 
-  <title>hokori – 浥轻尘i</title>
+  <title>strcpy函数实现 | hokori</title>
   
 
 
@@ -242,8 +243,7 @@
     
   
 
-  <div class="container sidebar-position-right 
-  page-home">
+  <div class="container sidebar-position-right page-post-detail">
     <div class="headband"></div>
 
     <a href="https://github.com/lingxd" class="github-corner" aria-label="View source on GitHub">
@@ -300,7 +300,7 @@
         
         
           
-          <li class="menu-item menu-item-home menu-item-active">
+          <li class="menu-item menu-item-home">
 
     
     
@@ -442,9 +442,9 @@
           
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -476,10 +476,8 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/10/19/C语言中volatile关键字的作用/" class="post-title-link" itemprop="url">strcpy函数实现</a>
+          <h2 class="post-title" itemprop="name headline">strcpy函数实现
+
               
             
           </h2>
@@ -608,28 +606,82 @@
       
 
       
-        
-          
-            <p>
-              C语言中volatile关键字的作用注：本文内容来源于冀博)博文，感谢作者的整理。
-volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作
-              ...
-            </p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/10/19/C语言中volatile关键字的作用/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
+        <h1 id="C语言中volatile关键字的作用"><a href="#C语言中volatile关键字的作用" class="headerlink" title="C语言中volatile关键字的作用"></a>C语言中volatile关键字的作用</h1><p><strong>注：本文内容来源于<a href="[https://blog.csdn.net/tigerjb/article/details/7427366](https://blog.csdn.net/tigerjb/article/details/7427366">冀博</a>)博文，感谢作者的整理。</strong></p>
+<h2 id="volatile详解"><a href="#volatile详解" class="headerlink" title="volatile详解"></a>volatile详解</h2><p>volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。<br>当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。<br>精确地说就是，遇到这个关键字声明的变量，编译器对访问该变量的代码就不再进行优化，从而可以提供对特殊地址的稳定访问；如果不使用valatile，则编译器将对所声明的语句进行优化。++<em>（简洁的说就是：volatile关键词影响编译器编译的结果，用volatile声明的变量表示该变量随时可能发生变化，与该变量有关的运算，不要进行编译优化，以免出错）</em>++</p>
+<h2 id="事例"><a href="#事例" class="headerlink" title="事例"></a>事例</h2><blockquote>
+<p>告诉==compiler(编译器)==不能做任何优化</p>
+</blockquote>
+<ul>
+<li>比如要往某一个地址发送两条指令</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> *ip =...; <span class="comment">//设备地址</span></span><br><span class="line">*ip = <span class="number">1</span>; <span class="comment">//第一个指令</span></span><br><span class="line">*ip = <span class="number">2</span>; <span class="comment">//第二个指令</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>以上程序compiler可能做优化而成：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> *ip = ...;</span><br><span class="line">*ip = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果第一个指令丢失。如果用volatile, compiler就不允许做任何的优化，从而保证程序的原意：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="keyword">int</span> *ip = ...;</span><br><span class="line">*ip = <span class="number">1</span>;</span><br><span class="line">*ip = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>即使你要compiler做优化，它也不会把两次付值语句间化为一。它只能做其它的优化。</p>
+<blockquote>
+<p>用volatile定义的变量会在程序外被改变,每次都必须从内存中读取，而不能重复使用放在cache或寄存器中的备份。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="keyword">char</span> a;</span><br><span class="line">    a=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span>(!a)&#123;</span><br><span class="line">    <span class="comment">//do some things;</span></span><br><span class="line">&#125;</span><br><span class="line">doother();</span><br></pre></td></tr></table></figure>
+<p>如果没有 volatiledoother()不会被执行</p>
+<h2 id="使用volatile变量的几个场景"><a href="#使用volatile变量的几个场景" class="headerlink" title="使用volatile变量的几个场景"></a>使用volatile变量的几个场景</h2><blockquote>
+<p>中断服务程序中修改的供其它程序检测的变量需要加volatile；</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> i=<span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">     ...</span><br><span class="line">     <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">     &#123;</span><br><span class="line">        <span class="keyword">if</span> (i) dosomething();</span><br><span class="line">     &#125;</span><br><span class="line">｝</span><br><span class="line"><span class="comment">/* Interrupt service routine. */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ISR_2</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">      i=<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>程序的本意是希望ISR_2中断产生时，在main函数中调用dosomething函数，但是，由于编译器判断在main函数里面没有修改过i，因此可能只执行一次对从i到某寄存器的读操作，然后每次if判断都只使用这个寄存器里面的“i副本”，导致dosomething永远也不会被调用。如果将变量加上volatile修饰，则编译器保证对此变量的读写操作都不会被优化（肯定执行）。此例中i也应该如此说明。</p>
+<blockquote>
+<p>多任务环境下各任务间共享的标志应该加volatile<br>存储器映射的硬件寄存器通常也要加voliate，因为每次对它的读写都可能有不同意义。</p>
+</blockquote>
+<ul>
+<li>例如：假设要对一个设备进行初始化，此设备的某一个寄存器为0xff800000。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>  *output = (<span class="keyword">unsigned</span>  <span class="keyword">int</span> *)<span class="number">0xff800000</span>;<span class="comment">//定义一个IO端口；</span></span><br><span class="line"><span class="function"><span class="keyword">int</span>  <span class="title">init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">      <span class="keyword">int</span> i;</span><br><span class="line">      <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt; <span class="number">10</span>;i++)</span><br><span class="line">      &#123;</span><br><span class="line">          *output = i;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>经过编译器优化后，编译器认为前面循环半天都是废话，对最后的结果毫无影响，因为最终只是将output这个指针赋值为9，所以编译器最后给你编译编译的代码结果相当于：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span>  <span class="title">init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">      *output = <span class="number">9</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果你对此外部设备进行初始化的过程是必须是像上面代码一样顺序的对其赋值，显然优化过程并不能达到目的。反之如果你不是对此端口反复写操作，而是反复读操作，其结果是一样的，编译器在优化后，也许你的代码对此地址的读操作只做了一次。然而从代码角度看是没有任何问题的。这时候就该使用volatile通知编译器这个变量是一个不稳定的，在遇到此变量时候不要优化。</p>
+<ul>
+<li>例如：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span>  <span class="keyword">int</span> *output=(<span class="keyword">volatile</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> *)<span class="number">0xff800000</span>;<span class="comment">//定义一个I/O端口</span></span><br></pre></td></tr></table></figure>
+<p>另外，以上这几种情况经常还要同时考虑数据的完整性（相互关联的几个标志读了一半被打断了重写），在1中可以通过关中断来实现，2中禁止任务调度，3中则只能依靠硬件的良好设计。</p>
+<h2 id="几个问题"><a href="#几个问题" class="headerlink" title="几个问题"></a>几个问题</h2><ol>
+<li>一个参数既可以是const还可以是volatile吗？<br><em>可以的，例如只读的状态寄存器。它是volatile因为它可能被意想不到地改变。它是const因为程序不应该试图去修改它。</em></li>
+<li>一个指针可以是volatile 吗？<br><em>可以，当一个中服务子程序修该一个指向一个buffer的指针时。</em></li>
+</ol>
+<h2 id="volatile的本质："><a href="#volatile的本质：" class="headerlink" title="volatile的本质："></a>volatile的本质：</h2><blockquote>
+<p>编译器的优化<br>在本次线程内, 当读取一个变量时，为提高存取速度，编译器优化时有时会先把变量读取到一个寄存器中；以后，再取变量值时，就直接从寄存器中取值；当变量值在本线程里改变时，会同时把变量的新值copy到该寄存器中，以便保持一致。</p>
+</blockquote>
+<p>当变量在因别的线程等而改变了值，该寄存器的值不会相应改变，从而造成应用程序读取的值和实际的变量值不一致。</p>
+<p>当该寄存器在因别的线程等而改变了值，原变量的值不会改变，从而造成应用程序读取的值和实际的变量值不一致。</p>
+<blockquote>
+<p>volatile应该解释为“直接存取原始内存地址”比较合适，“易变的”这种解释简直有点误导人。</p>
+</blockquote>
+<h2 id="下面的函数有什么错误："><a href="#下面的函数有什么错误：" class="headerlink" title="下面的函数有什么错误："></a>下面的函数有什么错误：</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">square</span><span class="params">(<span class="keyword">volatile</span> <span class="keyword">int</span> *ptr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> *ptr * *ptr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该程序的目的是用来返指针*ptr指向值的平方，但是，由于*ptr指向一个volatile型参数，编译器将产生类似下面的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">square</span><span class="params">(<span class="keyword">volatile</span> <span class="keyword">int</span> *ptr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a,b;</span><br><span class="line">    a = *ptr;</span><br><span class="line">    b = *ptr;</span><br><span class="line">    <span class="keyword">return</span> a * b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于*ptr的值可能被意想不到地该变，因此a和b可能是不同的。结果，这段代码可能返不是你所期望的平方值！正确的代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">square</span><span class="params">(<span class="keyword">volatile</span> <span class="keyword">int</span> *ptr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a;</span><br><span class="line">    a = *ptr;</span><br><span class="line">    <span class="keyword">return</span> a * a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>++<em>注意：频繁地使用volatile很可能会增加代码尺寸和降低性能,因此要合理的使用volatile。</em>++</p>
+
       
     </div>
 
     <div>
       
+      
+
+<div>
+
+    <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+
+</div>
+
+      
     </div>
 
     
@@ -646,450 +698,64 @@ volatile详解volatile的本意是“易变的” ，因为访问寄存器要比
     
 
     
+      <div>
+        
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>浥轻尘i</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://hokori.cn/2019/10/19/C语言中volatile关键字的作用/" title="strcpy函数实现">http://hokori.cn/2019/10/19/C语言中volatile关键字的作用/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <span class="exturl" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL3B1YmxpY2RvbWFpbi96ZXJvLzEuMC8="><i class="fa fa-fw fa-creative-commons"></i>ZERO</span> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hokori.cn/2019/10/19/strcpy函数实现/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="浥轻尘i">
-      <meta itemprop="description" content="hentai">
-      <meta itemprop="image" content="/images/android-chrome-512x512.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hokori">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/10/19/strcpy函数实现/" class="post-title-link" itemprop="url">strcpy函数实现</a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-10-19 10:21:09 / 修改时间：10:36:56" itemprop="dateCreated datePublished" datetime="2019-10-19T10:21:09+08:00">2019-10-19</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
+        <div class="post-tags">
           
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/笔记/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a></span>
-
-                
-                
-                  ，
-                
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/笔记/面试/" itemprop="url" rel="index"><span itemprop="name">面试</span></a></span>
-
-                
-                
-                  ，
-                
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/笔记/面试/C语言/" itemprop="url" rel="index"><span itemprop="name">C语言</span></a></span>
-
-                
-                
-              
-            </span>
+            <a href="/tags/C语言/" rel="tag"><i class="fa fa-tag"> </i> C语言</a>
           
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/2019/10/19/strcpy函数实现/" class="leancloud_visitors" data-flag-title="strcpy函数实现">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-
-          
-          <br>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-file-word-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">本文共计&#58;</span>
-            
-            <span title="本文共计">
-              568
-            </span>
-            <span class="post-meta-divider">|</span>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-clock-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">阅文耗时 &asymp;</span>
-            
-            <span title="阅文耗时">
-              2
-            </span>
+            <a href="/tags/volatile/" rel="tag"><i class="fa fa-tag"> </i> volatile</a>
           
         </div>
-      </header>
-    
+      
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
+      
       
       
 
       
-        
-          
-            <p>
-              strcpy函数实现strcpy函数的原型为：char* strcpy(char* _Dest, const char* _Source);
-//实现1char * strcpy(char* _Des
-              ...
-            </p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/10/19/strcpy函数实现/#more" rel="contents">
-                阅读全文 &raquo;
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/19/strcpy函数实现/" rel="next" title="strcpy函数实现">
+                <i class="fa fa-chevron-left"></i> strcpy函数实现
               </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hokori.cn/2019/10/09/C++析构函数为什么要为虚函数/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="浥轻尘i">
-      <meta itemprop="description" content="hentai">
-      <meta itemprop="image" content="/images/android-chrome-512x512.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hokori">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/10/09/C++析构函数为什么要为虚函数/" class="post-title-link" itemprop="url">C++析构函数为什么要为虚函数</a>
-              
             
-          </h2>
-        
+          </div>
 
-        <div class="post-meta">
-          <span class="post-time">
+          <span class="post-nav-divider"></span>
 
+          <div class="post-nav-prev post-nav-item">
             
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-10-09 08:57:08 / 修改时间：10:22:39" itemprop="dateCreated datePublished" datetime="2019-10-09T08:57:08+08:00">2019-10-09</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/笔记/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/2019/10/09/C++析构函数为什么要为虚函数/" class="leancloud_visitors" data-flag-title="C++析构函数为什么要为虚函数">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-
-          
-          <br>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-file-word-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">本文共计&#58;</span>
-            
-            <span title="本文共计">
-              1k
-            </span>
-            <span class="post-meta-divider">|</span>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-clock-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">阅文耗时 &asymp;</span>
-            
-            <span title="阅文耗时">
-              4
-            </span>
-          
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <p>
-              C++析构函数为什么要为虚函数注：本文内容来源于zhice163博文，感谢作者的整理。
-1.为什么基类的析构函数是虚函数？
-　　在实现多态时，当用基类操作派生类，在析构时防止只析构基类而不析构派生类的
-              ...
-            </p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/10/09/C++析构函数为什么要为虚函数/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -1099,659 +765,20 @@ volatile详解volatile的本意是“易变的” ，因为访问寄存器要比
   </article>
 
 
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hokori.cn/2019/06/20/使用PowerDesigner对NAME和COMMENT互相转换/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="浥轻尘i">
-      <meta itemprop="description" content="hentai">
-      <meta itemprop="image" content="/images/android-chrome-512x512.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hokori">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/06/20/使用PowerDesigner对NAME和COMMENT互相转换/" class="post-title-link" itemprop="url">使用PowerDesigner对NAME和COMMENT互相转换</a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-06-20 16:18:16" itemprop="dateCreated datePublished" datetime="2019-06-20T16:18:16+08:00">2019-06-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-06-21 20:32:51" itemprop="dateModified" datetime="2019-06-21T20:32:51+08:00">2019-06-21</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/教程/" itemprop="url" rel="index"><span itemprop="name">教程</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/2019/06/20/使用PowerDesigner对NAME和COMMENT互相转换/" class="leancloud_visitors" data-flag-title="使用PowerDesigner对NAME和COMMENT互相转换">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-
-          
-          <br>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-file-word-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">本文共计&#58;</span>
-            
-            <span title="本文共计">
-              551
-            </span>
-            <span class="post-meta-divider">|</span>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-clock-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">阅文耗时 &asymp;</span>
-            
-            <span title="阅文耗时">
-              2
-            </span>
-          
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>
-              使用PowerDesigner对NAME和COMMENT互相转换在使用PowerDesigner对数据库进行概念模型和物理模型设计时，一般在NAME或Comment中写中文，在Code中写英文。Nam
-              ...
-            </p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/06/20/使用PowerDesigner对NAME和COMMENT互相转换/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
   </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hokori.cn/2019/01/22/office2019VOLdeploy/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="浥轻尘i">
-      <meta itemprop="description" content="hentai">
-      <meta itemprop="image" content="/images/android-chrome-512x512.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hokori">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/01/22/office2019VOLdeploy/" class="post-title-link" itemprop="url">office2019VOL版本安装教程</a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-01-22 15:11:14" itemprop="dateCreated datePublished" datetime="2019-01-22T15:11:14+08:00">2019-01-22</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-08-29 09:12:57" itemprop="dateModified" datetime="2019-08-29T09:12:57+08:00">2019-08-29</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/教程/" itemprop="url" rel="index"><span itemprop="name">教程</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/2019/01/22/office2019VOLdeploy/" class="leancloud_visitors" data-flag-title="office2019VOL版本安装教程">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-
-          
-          <br>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-file-word-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">本文共计&#58;</span>
-            
-            <span title="本文共计">
-              532
-            </span>
-            <span class="post-meta-divider">|</span>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-clock-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">阅文耗时 &asymp;</span>
-            
-            <span title="阅文耗时">
-              2
-            </span>
-          
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>
-              本文转载自CSDN芸芸众生无名之辈
-
-众所周知，Office VOL版本可以连接KMS服务器激活，但是office2019没有镜像可以下载，所以只能依靠Office Deployment Tool来进
-              ...
-            </p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/01/22/office2019VOLdeploy/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://hokori.cn/2019/01/10/first_blog/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="浥轻尘i">
-      <meta itemprop="description" content="hentai">
-      <meta itemprop="image" content="/images/android-chrome-512x512.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="hokori">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/01/10/first_blog/" class="post-title-link" itemprop="url">第一条博客</a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-01-10 10:12:41" itemprop="dateCreated datePublished" datetime="2019-01-10T10:12:41+08:00">2019-01-10</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-01-22 16:36:55" itemprop="dateModified" datetime="2019-01-22T16:36:55+08:00">2019-01-22</time>
-              
-            
-          </span>
-
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/2019/01/10/first_blog/" class="leancloud_visitors" data-flag-title="第一条博客">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-
-          
-          <br>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-file-word-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">本文共计&#58;</span>
-            
-            <span title="本文共计">
-              4
-            </span>
-            <span class="post-meta-divider">|</span>
-            
-            <span class="post-meta-item-icon">
-              <i class="fa fa-clock-o"></i>
-            </span>
-            
-              <span class="post-meta-item-text">阅文耗时 &asymp;</span>
-            
-            <span title="阅文耗时">
-              1
-            </span>
-          
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>
-              Hello World!物语
-
-              
-            </p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/01/10/first_blog/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-  </section>
-
-  
 
 
           </div>
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC80MjE2OS8xODcxNg=="></div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -1774,8 +801,17 @@ volatile详解volatile的本意是“易变的” ，因为访问寄存器要比
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -1945,6 +981,23 @@ volatile详解volatile的本意是“易变的” ，因为访问寄存器要比
       </div>
 
       
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content" style="fone-size=14px"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C语言中volatile关键字的作用"><span class="nav-number">1.</span> <span class="nav-text">C语言中volatile关键字的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#volatile详解"><span class="nav-number">1.1.</span> <span class="nav-text">volatile详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事例"><span class="nav-number">1.2.</span> <span class="nav-text">事例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用volatile变量的几个场景"><span class="nav-number">1.3.</span> <span class="nav-text">使用volatile变量的几个场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#几个问题"><span class="nav-number">1.4.</span> <span class="nav-text">几个问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#volatile的本质："><span class="nav-number">1.5.</span> <span class="nav-text">volatile的本质：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下面的函数有什么错误："><span class="nav-number">1.6.</span> <span class="nav-text">下面的函数有什么错误：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
 
       
       
@@ -2103,6 +1156,10 @@ volatile详解volatile的本意是“易变的” ，因为访问寄存器要比
 
 
   
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
 
   
 
@@ -2113,6 +1170,23 @@ volatile详解volatile的本意是“易变的” ，因为访问寄存器要比
 
   
 
+
+  
+    <script>
+  window.livereOptions = {
+    refer: '2019/10/19/C语言中volatile关键字的作用/'
+  };
+  (function(d, s) {
+    var j, e = d.getElementsByTagName(s)[0];
+    if (typeof LivereTower === 'function') { return; }
+    j = d.createElement(s);
+    j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+    j.async = true;
+    e.parentNode.insertBefore(j, e);
+  })(document, 'script');
+</script>
+
+  
 
 
   
@@ -2445,38 +1519,37 @@ volatile详解volatile的本意是“易变的” ，因为访问寄存器要比
   
   <script>
     
-    function showTime(Counter) {
-      var entries = [];
+    function addCount(Counter) {
       var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
 
-      $visitors.each(function() {
-        entries.push( $(this).attr('id').trim() );
-      });
-
-      Counter('get', '/classes/Counter', { where: JSON.stringify({ url: { '$in': entries } }) })
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
         .done(function({ results }) {
-          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
-
-          if (results.length === 0) {
-            $visitors.find(COUNT_CONTAINER_REF).text(0);
-            return;
-          }
-
-          for (var i = 0; i < results.length; i++) {
-            var item = results[i];
-            var url = item.url;
-            var time = item.time;
-            var element = document.getElementById(url);
-
-            $(element).find(COUNT_CONTAINER_REF).text(time);
-          }
-          for (var i = 0; i < entries.length; i++) {
-            var url = entries[i];
-            var element = document.getElementById(url);
-            var countSpan = $(element).find(COUNT_CONTAINER_REF);
-            if (countSpan.text() == '') {
-              countSpan.text(0);
-            }
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log(`Failed to save Visitor num, with error message: ${responseJSON.error}`);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
           }
         })
         .fail(function ({ responseJSON }) {
@@ -2501,9 +1574,7 @@ volatile详解volatile的本意是“易变的” ，因为访问寄存器要比
             });
           };
           
-            if ($('.post-title-link').length >= 1) {
-              showTime(Counter);
-            }
+            addCount(Counter);
           
         });
     });
