@@ -155,18 +155,18 @@
 
 
 
-  <meta name="description" content="C语言中volatile关键字的作用注：本文内容来源于冀博)博文，感谢作者的整理。 volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的">
+  <meta name="description" content="C语言中volatile关键字的作用注：本文内容来源于冀博博文，感谢作者的整理。 volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的变">
 <meta name="keywords" content="C语言,volatile">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C语言中volatile关键字的作用">
 <meta property="og:url" content="http://hokori.cn/2019/10/19/C语言中volatile关键字的作用/index.html">
 <meta property="og:site_name" content="hokori">
-<meta property="og:description" content="C语言中volatile关键字的作用注：本文内容来源于冀博)博文，感谢作者的整理。 volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的">
+<meta property="og:description" content="C语言中volatile关键字的作用注：本文内容来源于冀博博文，感谢作者的整理。 volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的变">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-10-19T02:48:04.742Z">
+<meta property="og:updated_time" content="2019-10-19T04:06:41.046Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C语言中volatile关键字的作用">
-<meta name="twitter:description" content="C语言中volatile关键字的作用注：本文内容来源于冀博)博文，感谢作者的整理。 volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的">
+<meta name="twitter:description" content="C语言中volatile关键字的作用注：本文内容来源于冀博博文，感谢作者的整理。 volatile详解volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。精确地说就是，遇到这个关键字声明的变">
 
 
 
@@ -502,7 +502,7 @@
                 
               
 
-              <time title="创建时间：2019-10-19 10:21:09 / 修改时间：10:48:04" itemprop="dateCreated datePublished" datetime="2019-10-19T10:21:09+08:00">2019-10-19</time>
+              <time title="创建时间：2019-10-19 10:21:09 / 修改时间：12:06:41" itemprop="dateCreated datePublished" datetime="2019-10-19T10:21:09+08:00">2019-10-19</time>
             
 
             
@@ -606,8 +606,8 @@
       
 
       
-        <h1 id="C语言中volatile关键字的作用"><a href="#C语言中volatile关键字的作用" class="headerlink" title="C语言中volatile关键字的作用"></a>C语言中volatile关键字的作用</h1><p><strong>注：本文内容来源于<a href="[https://blog.csdn.net/tigerjb/article/details/7427366](https://blog.csdn.net/tigerjb/article/details/7427366">冀博</a>)博文，感谢作者的整理。</strong></p>
-<h2 id="volatile详解"><a href="#volatile详解" class="headerlink" title="volatile详解"></a>volatile详解</h2><p>volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。<br>当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。<br>精确地说就是，遇到这个关键字声明的变量，编译器对访问该变量的代码就不再进行优化，从而可以提供对特殊地址的稳定访问；如果不使用valatile，则编译器将对所声明的语句进行优化。++<em>（简洁的说就是：volatile关键词影响编译器编译的结果，用volatile声明的变量表示该变量随时可能发生变化，与该变量有关的运算，不要进行编译优化，以免出错）</em>++</p>
+        <h1 id="C语言中volatile关键字的作用"><a href="#C语言中volatile关键字的作用" class="headerlink" title="C语言中volatile关键字的作用"></a>C语言中volatile关键字的作用</h1><p><strong>注：本文内容来源于<span class="exturl" data-url="aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3RpZ2VyamIvYXJ0aWNsZS9kZXRhaWxzLzc0MjczNjY=" title="https://blog.csdn.net/tigerjb/article/details/7427366">冀博<i class="fa fa-external-link"></i></span>博文，感谢作者的整理。</strong></p>
+<h2 id="volatile详解"><a href="#volatile详解" class="headerlink" title="volatile详解"></a>volatile详解</h2><p>volatile的本意是“易变的” ，因为访问寄存器要比访问内存单元快的多，所以编译器一般都会作减少存取内存的优化，但有可能会读脏数据。<br>当要求使用volatile声明变量值的时候，==系统总是重新从它所在的内存读取数据==，即使它前面的指令刚刚从该处读取过数据。<br>精确地说就是，遇到这个关键字声明的变量，编译器对访问该变量的代码就不再进行优化，从而可以提供对特殊地址的稳定访问；如果不使用valatile，则编译器将对所声明的语句进行优化。<em>（简洁的说就是：volatile关键词影响编译器编译的结果，用volatile声明的变量表示该变量随时可能发生变化，与该变量有关的运算，不要进行编译优化，以免出错）</em></p>
 <h2 id="事例"><a href="#事例" class="headerlink" title="事例"></a>事例</h2><blockquote>
 <p>告诉==compiler(编译器)==不能做任何优化</p>
 </blockquote>
@@ -666,7 +666,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">square</span><span class="params">(<span class="keyword">volatile</span> <span class="keyword">int</span> *ptr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a,b;</span><br><span class="line">    a = *ptr;</span><br><span class="line">    b = *ptr;</span><br><span class="line">    <span class="keyword">return</span> a * b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>由于*ptr的值可能被意想不到地该变，因此a和b可能是不同的。结果，这段代码可能返不是你所期望的平方值！正确的代码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">square</span><span class="params">(<span class="keyword">volatile</span> <span class="keyword">int</span> *ptr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a;</span><br><span class="line">    a = *ptr;</span><br><span class="line">    <span class="keyword">return</span> a * a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>++<em>注意：频繁地使用volatile很可能会增加代码尺寸和降低性能,因此要合理的使用volatile。</em>++</p>
+<p><em>注意：频繁地使用volatile很可能会增加代码尺寸和降低性能,因此要合理的使用volatile。</em></p>
 
       
     </div>
