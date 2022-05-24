@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hokori.cn","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="互斥锁std::mutex是一种最常见的线程间同步的手段，但是在有些情况下不太高效。 假设想实现一个简单的消费者生产者模型，一个线程往队列中放入数据，一个线程往队列中取数据，取数据前需要判断一下队列中确实有数据，由于这个队列是线程间共享的，所以，需要使用互斥锁进行保护，一个线程在往队列添加数据的时候，另一个线程不能取，反之亦然。用互斥锁实现如下： 1234567891011121314151617">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++11多线程(6)【条件变量(Condition Variable)】">
+<meta property="og:url" content="http://hokori.cn/2019/12/04/C++11%E5%A4%9A%E7%BA%BF%E7%A8%8B(6)%E3%80%90%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E3%80%91/index.html">
+<meta property="og:site_name" content="hokori">
+<meta property="og:description" content="互斥锁std::mutex是一种最常见的线程间同步的手段，但是在有些情况下不太高效。 假设想实现一个简单的消费者生产者模型，一个线程往队列中放入数据，一个线程往队列中取数据，取数据前需要判断一下队列中确实有数据，由于这个队列是线程间共享的，所以，需要使用互斥锁进行保护，一个线程在往队列添加数据的时候，另一个线程不能取，反之亦然。用互斥锁实现如下： 1234567891011121314151617">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4427263-4ac3dca6030dd96f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/616/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4427263-236c78f4efd1ef35.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/630/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/4427263-236c78f4efd1ef35.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/630/format/webp">
+<meta property="article:published_time" content="2019-12-04T12:21:09.000Z">
+<meta property="article:modified_time" content="2022-05-24T03:36:52.547Z">
+<meta property="article:author" content="hokori">
+<meta property="article:tag" content="C++11">
+<meta property="article:tag" content="线程">
+<meta property="article:tag" content="条件变量">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/4427263-4ac3dca6030dd96f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/616/format/webp">
+
+<link rel="canonical" href="http://hokori.cn/2019/12/04/C++11%E5%A4%9A%E7%BA%BF%E7%A8%8B(6)%E3%80%90%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E3%80%91/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>C++11多线程(6)【条件变量(Condition Variable)】 | hokori</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">hokori</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">浥轻尘i</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://hokori.cn/2019/12/04/C++11%E5%A4%9A%E7%BA%BF%E7%A8%8B(6)%E3%80%90%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E3%80%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="hokori">
+      <meta itemprop="description" content="hentai">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="hokori">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++11多线程(6)【条件变量(Condition Variable)】
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-04 20:21:09" itemprop="dateCreated datePublished" datetime="2019-12-04T20:21:09+08:00">2019-12-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-24 11:36:52" itemprop="dateModified" datetime="2022-05-24T11:36:52+08:00">2022-05-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">笔记</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/C-11/" itemprop="url" rel="index"><span itemprop="name">C++11</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AC%94%E8%AE%B0/C-11/%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">线程</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>互斥锁<code>std::mutex</code>是一种最常见的线程间同步的手段，但是在有些情况下不太高效。</p>
+<p>假设想实现一个简单的消费者生产者模型，一个线程往队列中放入数据，一个线程往队列中取数据，取数据前需要判断一下队列中确实有数据，由于这个队列是线程间共享的，所以，需要使用互斥锁进行保护，一个线程在往队列添加数据的时候，另一个线程不能取，反之亦然。用互斥锁实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;deque&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;mutex&gt;</span></span></span><br><span class="line"></span><br><span class="line">std::deque&lt;<span class="type">int</span>&gt; q;</span><br><span class="line">std::mutex mu;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">function_1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> count = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">while</span> (count &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">locker</span><span class="params">(mu)</span></span>;</span><br><span class="line">        q.<span class="built_in">push_front</span>(count);</span><br><span class="line">        locker.<span class="built_in">unlock</span>();</span><br><span class="line">        std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">1</span>));</span><br><span class="line">        count--;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">function_2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> data = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> ( data != <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">locker</span><span class="params">(mu)</span></span>;</span><br><span class="line">        <span class="keyword">if</span> (!q.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">            data = q.<span class="built_in">back</span>();</span><br><span class="line">            q.<span class="built_in">pop_back</span>();</span><br><span class="line">            locker.<span class="built_in">unlock</span>();</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;t2 got a value from t1: &quot;</span> &lt;&lt; data &lt;&lt; std::endl;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            locker.<span class="built_in">unlock</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">t1</span><span class="params">(function_1)</span></span>;</span><br><span class="line">    <span class="function">std::thread <span class="title">t2</span><span class="params">(function_2)</span></span>;</span><br><span class="line">    t1.<span class="built_in">join</span>();</span><br><span class="line">    t2.<span class="built_in">join</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//输出结果</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 10</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 9</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 8</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 7</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 6</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 5</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 4</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 3</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 2</span></span><br><span class="line"><span class="comment">//t2 got a value from t1: 1</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，互斥锁其实可以完成这个任务，但是却存在着性能问题。</p>
+<p>首先，<code>function_1</code>函数是生产者，在生产过程中，<code>std::this_thread::sleep_for(std::chrono::seconds(1));</code>表示延时<code>1s</code>，所以这个生产的过程是很慢的；<code>function_2</code>函数是消费者，存在着一个<code>while</code>循环，只有在接收到表示结束的数据的时候，才会停止，每次循环内部，都是先加锁，判断队列不空，然后就取出一个数，最后解锁。所以说，在<code>1s</code>内，做了很多无用功！这样的话，CPU占用率会很高，可能达到100%（单核）。如图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4427263-4ac3dca6030dd96f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/616/format/webp" alt="img"></p>
+<p>CPU占用率.png</p>
+<p>解决办法之一是给消费者也加一个小延时，如果一次判断后，发现队列是空的，就惩罚一下自己，延时<code>500ms</code>，这样可以减小CPU的占用率。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">function_2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> data = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> ( data != <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">locker</span><span class="params">(mu)</span></span>;</span><br><span class="line">        <span class="keyword">if</span> (!q.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">            data = q.<span class="built_in">back</span>();</span><br><span class="line">            q.<span class="built_in">pop_back</span>();</span><br><span class="line">            locker.<span class="built_in">unlock</span>();</span><br><span class="line">            std::cout &lt;&lt; <span class="string">&quot;t2 got a value from t1: &quot;</span> &lt;&lt; data &lt;&lt; std::endl;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            locker.<span class="built_in">unlock</span>();</span><br><span class="line">            std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">milliseconds</span>(<span class="number">500</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4427263-236c78f4efd1ef35.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/630/format/webp" alt="img"></p>
+<p>使用延时的CPU占用率.png</p>
+<p>然后困难之处在于，如何确定这个延时时间呢，假如生产者生产的很快，消费者却延时<code>500ms</code>，也不是很好，如果生产者生产的更慢，那么消费者延时<code>500ms</code>，还是不必要的占用了CPU。</p>
+<p>这就引出了条件变量（condition variable）,<code>c++11</code>中提供了<code>#include </code>头文件，其中的<code>std::condition_variable</code>可以和<code>std::mutex</code>结合一起使用，其中有两个重要的接口，<code>notify_one()</code>和<code>wait()</code>，<code>wait()</code>可以让线程陷入<strong>休眠状态</strong>，在消费者生产者模型中，如果生产者发现队列中没有东西，就可以让自己休眠，但是不能一直不干活啊，<code>notify_one()</code>就是<strong>唤醒</strong>处于<code>wait</code>中的<strong>其中一个条件变量</strong>（可能当时有很多条件变量都处于<code>wait</code>状态）。那什么时刻使用<code>notify_one()</code>比较好呢，当然是在生产者往队列中放数据的时候了，队列中有数据，就可以赶紧叫醒等待中的线程起来干活了。</p>
+<p>使用条件变量修改后如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;deque&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;thread&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;mutex&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;condition_variable&gt;</span></span></span><br><span class="line"></span><br><span class="line">std::deque&lt;<span class="type">int</span>&gt; q;</span><br><span class="line">std::mutex mu;</span><br><span class="line">std::condition_variable cond;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">function_1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> count = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">while</span> (count &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">locker</span><span class="params">(mu)</span></span>;</span><br><span class="line">        q.<span class="built_in">push_front</span>(count);</span><br><span class="line">        locker.<span class="built_in">unlock</span>();</span><br><span class="line">        cond.<span class="built_in">notify_one</span>();  <span class="comment">// Notify one waiting thread, if there is one.</span></span><br><span class="line">        std::this_thread::<span class="built_in">sleep_for</span>(std::chrono::<span class="built_in">seconds</span>(<span class="number">1</span>));</span><br><span class="line">        count--;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">function_2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> data = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> ( data != <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">locker</span><span class="params">(mu)</span></span>;</span><br><span class="line">        <span class="keyword">while</span>(q.<span class="built_in">empty</span>())</span><br><span class="line">            cond.<span class="built_in">wait</span>(locker); <span class="comment">// Unlock mu and wait to be notified</span></span><br><span class="line">        data = q.<span class="built_in">back</span>();</span><br><span class="line">        q.<span class="built_in">pop_back</span>();</span><br><span class="line">        locker.<span class="built_in">unlock</span>();</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;t2 got a value from t1: &quot;</span> &lt;&lt; data &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function">std::thread <span class="title">t1</span><span class="params">(function_1)</span></span>;</span><br><span class="line">    <span class="function">std::thread <span class="title">t2</span><span class="params">(function_2)</span></span>;</span><br><span class="line">    t1.<span class="built_in">join</span>();</span><br><span class="line">    t2.<span class="built_in">join</span>();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时CPU的占用率也很低。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/4427263-236c78f4efd1ef35.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/630/format/webp" alt="img"></p>
+<p>使用条件变量时的CPU占用率.png</p>
+<p>上面的代码有三个注意事项：</p>
+<ol>
+<li>在<code>function_2</code>中，在判断队列是否为空的时候，使用的是<code>while(q.empty())</code>，而不是<code>if(q.empty())</code>，这是因为<code>wait()</code>从阻塞到返回，不一定就是由于<code>notify_one()</code>函数造成的，还有可能由于系统的不确定原因唤醒（可能和条件变量的实现机制有关），这个的时机和频率都是不确定的，被称作<strong>伪唤醒</strong>，如果在错误的时候被唤醒了，执行后面的语句就会错误，所以需要再次判断队列是否为空，如果还是为空，就继续<code>wait()</code>阻塞。</li>
+<li>在管理互斥锁的时候，使用的是<code>std::unique_lock</code>而不是<code>std::lock_guard</code>，而且事实上也不能使用<code>std::lock_guard</code>，这需要先解释下<code>wait()</code>函数所做的事情。可以看到，在<code>wait()</code>函数之前，使用互斥锁保护了，如果<code>wait</code>的时候什么都没做，岂不是一直持有互斥锁？那生产者也会一直卡住，不能够将数据放入队列中了。所以，**<code>wait()</code>函数会先调用互斥锁的<code>unlock()</code>函数，然后再将自己睡眠，在被唤醒后，又会继续持有锁，保护后面的队列操作。**而<code>lock_guard</code>没有<code>lock</code>和<code>unlock</code>接口，而<code>unique_lock</code>提供了。这就是必须使用<code>unique_lock</code>的原因。</li>
+<li>使用细粒度锁，尽量减小锁的范围，在<code>notify_one()</code>的时候，不需要处于互斥锁的保护范围内，所以在唤醒条件变量之前可以将锁<code>unlock()</code>。</li>
+</ol>
+<p>还可以将<code>cond.wait(locker);</code>换一种写法，<code>wait()</code>的第二个参数可以传入一个函数表示检查条件，这里使用<code>lambda</code>函数最为简单，如果这个函数返回的是<code>true</code>，<code>wait()</code>函数不会阻塞会直接返回，如果这个函数返回的是<code>false</code>，<code>wait()</code>函数就会阻塞着等待唤醒，如果被伪唤醒，会继续判断函数返回值。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">function_2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> data = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> ( data != <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="function">std::unique_lock&lt;std::mutex&gt; <span class="title">locker</span><span class="params">(mu)</span></span>;</span><br><span class="line">        cond.<span class="built_in">wait</span>(locker, []()&#123; <span class="keyword">return</span> !q.<span class="built_in">empty</span>();&#125; );  <span class="comment">// Unlock mu and wait to be notified</span></span><br><span class="line">        data = q.<span class="built_in">back</span>();</span><br><span class="line">        q.<span class="built_in">pop_back</span>();</span><br><span class="line">        locker.<span class="built_in">unlock</span>();</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;t2 got a value from t1: &quot;</span> &lt;&lt; data &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了<code>notify_one()</code>函数，<code>c++</code>还提供了<code>notify_all()</code>函数，可以同时唤醒所有处于<code>wait</code>状态的条件变量。</p>
+<p>作者：<a target="_blank" rel="noopener" href="https://www.jianshu.com/u/a549acfa2f33">StormZhu</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C-11/" rel="tag"># C++11</a>
+              <a href="/tags/%E7%BA%BF%E7%A8%8B/" rel="tag"># 线程</a>
+              <a href="/tags/%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F/" rel="tag"># 条件变量</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/03/C++11%E5%A4%9A%E7%BA%BF%E7%A8%8B(5)%E3%80%90%E4%BA%92%E6%96%A5%E9%94%81%E3%80%91/" rel="prev" title="C++11多线程(5)【互斥锁(unique_lock)】">
+      <i class="fa fa-chevron-left"></i> C++11多线程(5)【互斥锁(unique_lock)】
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/25/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" rel="next" title="面向对象设计原则">
+      面向对象设计原则 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">hokori</p>
+  <div class="site-description" itemprop="description">hentai</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hokori</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
